@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  name       String
+  password   String
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  projectMember ProjectMembers[]
+}
+
+model Project {
+  id          Int       @id @default(autoincrement())
+  name        String
+  description String
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime?
+  members     ProjectMembers[]
+  tasks       Task[]
+}
+
+model ProjectMembers {
+  id         Int       @id @default(autoincrement())
+  user_id    Int
+  project_id Int
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  user       User      @relation(fields: [user_id], references: [id])
+  project    Project   @relation(fields: [project_id], references: [id])
+}
+
+model Task {
+  id          Int       @id @default(autoincrement())
+  title       String    @max_length(255)
+  description String
+  Status      String
+  project_id  Int
+  created_at  DateTime  @default(now())
+  updated_at  DateTime  @updatedAt
+  deleted_at  DateTime?
+  project     Project   @relation(fields: [project_id], references: [id])
+  tags        Tag[]
+}
+
+model Tag {
+  id         Int       @id @default(autoincrement())
+  title      String
+  task_id    Int
+  created_at DateTime  @default(now())
+  updated_at DateTime  @updatedAt
+  deleted_at DateTime?
+  task       Task      @relation(fields: [task_id], references: [id])
+}
